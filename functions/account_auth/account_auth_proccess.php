@@ -2,24 +2,27 @@
 include "configuration.php";
 
 function gencode(){
-	$_SESSION["expire_code"] = time();
 	$_SESSION["otpcode"] = random_int(100000, 999999);
 	return $_SESSION["otpcode"];
 }
 
-function runcode($code){
-	if (isset($_SESSION['start']) && ($_SESSION["expire_code"] - $_SESSION['start'] > 1000)) {
-		unset($_SESSION["otpcode"]);
-		unset($_SESSION["expire_code"]);
-		echo "<script>swal('Code has expired')</script>";
-	}else{
-		if ($_SESSION["otpcode"] === $code) {
-			echo "<script>swal('Account Verified')</script>";
-		}else{
-			echo "<script>swal('Wrong OTP code')</script>";
+function verifyotp($code){
+	global $con;
+	$userid = $_SESSION['wallet_account_id'];
+	if ($code == $_SESSION["otpcode"]) {
+		$sql = "UPDATE `accounts` SET `account_verified_phone` = '1' WHERE `accounts`.`account_id` = '$userid';";
+		if ($con->query($sql) === TRUE) {
+			echo "<script>swal('Account verified successfully');
+		setTimeout(function(){window.location = '../../account/';},1500);
+		</script>";
 		}
+		else{
+			echo "<script>swal('Account verification failed');</script>";
+		}
+		
+	}else{
+		echo "<script>swal('Wrong OTP code')</script>";
 	}
-	return $res;
 }
 
 function phoneotp($phone){
@@ -49,11 +52,17 @@ function phoneotp($phone){
 	    'Content-Length: ' . strlen($payload)
 	    ));
 	    $result = curl_exec($ch);
-	    echo var_export($result, true);
+	    $re = json_decode($result, true);
+	    if ($re['responseCode'] == "200") {
+	    	echo "<script>swal('Code has been sent');</script>";
+	    }else{
+	    	echo "<script>swal('There was an error sending code;</script>";
+	    }
+	    // echo var_export($result['responseCode'], true);
 	    curl_close($ch);
 	    $res = "";
 	}else{
-		$res = "empty";
+		$res = "<script>swal('Phone number was empty');</script>";
 	}
 	return $res;
 }

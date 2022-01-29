@@ -1,11 +1,19 @@
+<?php
+include "../../functions/account_auth/account_auth_proccess.php";
+if (!isset($_SESSION['wallet_logged_in'])) {
+	header("location: login");
+	exit;
+}
+?>
 <!doctype html>
 <html lang="en">
   <head>
-  	<title>Wallet | Forgot Password</title>
+  	<title>Wallet | Verify Phone</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<link rel="stylesheet" href="../assets/css/style.css">
 	<style type="text/css">
 		body{
@@ -54,15 +62,31 @@ body::-webkit-scrollbar-thumb {
 			      		</div>
 			      	</div>
 			      	<?php
-			      		
+			      	if (isset($_POST['verifyotp'])) {
+						$otpcode =  $_POST['otp'];
+						verifyotp($otpcode);
+					}
 			      	?>
-					<form action="#" class="signin-form">
+					<form action="" class="signin-form" method="POST">
 			      		<div class="form-group mb-3">
 			      			<label class="label" for="name">Please enter the code you received</label>
-			      			<input type="text" class="form-control" placeholder="OTP" maxlength="6" style="text-align: center;letter-spacing: 6px;" required>
+			      			<input type="text" class="form-control" placeholder="OTP" maxlength="6" style="text-align: center;letter-spacing: 7px;" name="otp">
 			      		</div>
+			      	<?php
+
+			      	if(isset($_POST["requestcode"])){
+				        if (isset($_SESSION['wallet_account_phone'])) {
+			      			if ($_SESSION['wallet_account_phone']!="") {
+			      				phoneotp($_SESSION['wallet_account_phone']);
+			      				$_POST["requestcode"] = FALSE;
+			      			}
+			      			$_POST["requestcode"] = FALSE;
+			      		}
+				    }
+			      		
+			      	?>
 		            <div class="form-group">
-		            	<button type="submit" class="form-control btn btn-primary rounded submit px-3">Remember</button>
+		            	<button type="submit" class="form-control btn btn-primary rounded submit px-3" name="verifyotp">Verify</button>
 		            </div>
 		            <div class="form-group d-md-flex">
 		            	<div class="w-50 text-left">
@@ -76,6 +100,9 @@ body::-webkit-scrollbar-thumb {
 									</div>
 		            </div>
 		          </form>
+		          <center><form action="" method="POST">
+		          	<button class="btn btn-primary mb-3 w-50" name="requestcode">Request for new code</button>
+		          </form></center>
 		          <p class="text-center">Not a member? <a href="../login/">Login</a></p>
 		        </div>
 		      </div>
@@ -88,6 +115,7 @@ body::-webkit-scrollbar-thumb {
   <script src="../assets/js/popper.js"></script>
   <script src="../assets/js/bootstrap.min.js"></script>
   <script src="../assets/js/main.js"></script>
+
 
 	</body>
 </html>
