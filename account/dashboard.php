@@ -1,10 +1,11 @@
 <?php
 include "../functions/account_auth/account_auth_proccess.php";
+include '../functions/handlers/handler_data_protection.php';
 if (!isset($_SESSION['wallet_logged_in'])) {
   header("location: ../authentication/login");
   exit;
 }else{
-  if (isset($_SESSION['start']) && (time() - $_SESSION['start'] > 600)) {
+  if (isset($_SESSION['start']) && (time() - $_SESSION['start'] > 6000)) {
     session_unset();
     session_destroy();
     header("Location: ../authentication/login");
@@ -49,7 +50,7 @@ if (!isset($_SESSION['wallet_logged_in'])) {
             <div class="col-md-12 grid-margin">
               <div class="row">
                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                  <h3 class="font-weight-bold">Welcome <?=$_SESSION['wallet_account_fname'];?></h3>
+                  <h3 class="font-weight-bold">Welcome <?=Decrypt($_SESSION['wallet_account_fname']);?></h3>
                   <h6 class="font-weight-normal mb-0">All systems are running smoothly! You have <span class="text-primary">3 unread alerts!</span></h6>
                 </div>
                 <div class="col-12 col-xl-4">

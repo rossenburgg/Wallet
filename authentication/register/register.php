@@ -57,19 +57,24 @@ body::-webkit-scrollbar-thumb {
 			      	<?php
 			      	include "../../functions/account_auth/configuration.php";
 			      	include "../../functions/uuidgen.php";
+			      	include '../../functions/handlers/handler_data_protection.php';
 			      	$ref = guidv4();
 			      	if (isset($_POST['fname'],$_POST['lname'],$_POST['email'],$_POST['phone'],$_POST['password'],$_POST['confirmpass'])) {
 			      		$fname = stripslashes($_REQUEST['fname']); 
         				$fname = mysqli_real_escape_string($con, $fname);
+        				$fname1 = Encrypt($fname);
 
         				$lname = stripslashes($_REQUEST['lname']); 
         				$lname = mysqli_real_escape_string($con, $lname);
+        				$lname1 = Encrypt($lname);
 
         				$email = stripslashes($_REQUEST['email']); 
         				$email = mysqli_real_escape_string($con, $email);
+        				
 
         				$phone = stripslashes($_REQUEST['phone']); 
         				$phone = mysqli_real_escape_string($con, $phone);
+        				$phone1 = Encrypt($phone);
 
         				$password = stripslashes($_REQUEST['password']); 
         				$password = mysqli_real_escape_string($con, $password);
@@ -77,11 +82,13 @@ body::-webkit-scrollbar-thumb {
         				$confirmpass = stripslashes($_REQUEST['confirmpass']); 
         				$confirmpass = mysqli_real_escape_string($con, $confirmpass);
 
+        				$balance = Encrypt("0");
+
         				$id = time();
 
         				if ($password === $confirmpass) {
         					$passwordreal = password_hash($password, PASSWORD_DEFAULT);
-        					$query = "INSERT INTO `accounts`(`account_id`, `account_ref`, `account_fname`, `account_lname`, `account_password`, `account_email`, `account_phone`, `account_verified_phone`, `account_verified_email`, `balance`, `account_stat`, `account_date_start`) VALUES ('$id','$ref','$fname','$lname','$passwordreal','$email','$phone','0','0','0','0',CURRENT_TIMESTAMP())";
+        					$query = "INSERT INTO `accounts`(`account_id`, `account_ref`, `account_fname`, `account_lname`, `account_password`, `account_email`, `account_phone`, `account_verified_phone`, `account_verified_email`, `balance`, `account_stat`, `account_date_start`) VALUES ('$id','$ref','$fname1','$lname1','$passwordreal','$email','$phone1','0','0','$balance','0',CURRENT_TIMESTAMP())";
         					$signup = mysqli_query($con, $query);
         					if ($signup) {
 					            echo '<script>

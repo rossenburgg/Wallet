@@ -1,5 +1,6 @@
 <?php
 include "../../functions/account_auth/account_auth_proccess.php";
+include '../../functions/handlers/handler_data_protection.php';
 if (!isset($_SESSION['wallet_logged_in'])) {
 	header("location: login");
 	exit;
@@ -64,12 +65,17 @@ body::-webkit-scrollbar-thumb {
 			      	<?php
 			      	if (isset($_POST['verifyotp'])) {
 						$otpcode =  $_POST['otp'];
-						verifyotp($otpcode);
+						if ($otpcode!="") {
+							verifyotp($otpcode);
+						}else{
+							echo "<script>swal('Please check the code and try again')</script>";
+						}
+						
 					}
 			      	?>
 					<form action="" class="signin-form" method="POST">
 			      		<div class="form-group mb-3">
-			      			<label class="label" for="name">Please enter the code you received</label>
+			      			<label class="label" for="name">Please enter the code you received <?=Decrypt($_SESSION['wallet_account_phone']);?></label>
 			      			<input type="text" class="form-control" placeholder="OTP" maxlength="6" style="text-align: center;letter-spacing: 7px;" name="otp">
 			      		</div>
 			      	<?php
@@ -77,13 +83,14 @@ body::-webkit-scrollbar-thumb {
 			      	if(isset($_POST["requestcode"])){
 				        if (isset($_SESSION['wallet_account_phone'])) {
 			      			if ($_SESSION['wallet_account_phone']!="") {
-			      				phoneotp($_SESSION['wallet_account_phone']);
+			      				$phone = Decrypt($_SESSION['wallet_account_phone']);
+			      				phoneotp($phone);
 			      				$_POST["requestcode"] = FALSE;
 			      			}
 			      			$_POST["requestcode"] = FALSE;
 			      		}
 				    }
-			      		
+			      	
 			      	?>
 		            <div class="form-group">
 		            	<button type="submit" class="form-control btn btn-primary rounded submit px-3" name="verifyotp">Verify</button>
@@ -101,7 +108,7 @@ body::-webkit-scrollbar-thumb {
 		            </div>
 		          </form>
 		          <center><form action="" method="POST">
-		          	<button class="btn btn-primary mb-3 w-50" name="requestcode">Request for new code</button>
+		          	<button class="btn btn-primary mb-3 w-50" name="requestcode">Request for code</button>
 		          </form></center>
 		          <p class="text-center">Not a member? <a href="../login/">Login</a></p>
 		        </div>
